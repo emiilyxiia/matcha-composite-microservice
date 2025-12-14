@@ -10,7 +10,7 @@ app = FastAPI(
 @app.get("/")
 def root():
     return {
-        "Welcome to the Matcha Drinking Tracker API. See /docs for OpenAPI UI."
+        "message": "Welcome to the Matcha Drinking Tracker API. See /docs for OpenAPI UI."
     }
 
 app.add_middleware(
