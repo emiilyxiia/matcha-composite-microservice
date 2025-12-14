@@ -7,13 +7,15 @@ app = FastAPI(
     version="0.1.0",
 )
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+@app.get("/")
+def root():
+    return {
+        "Welcome to the Matcha Drinking Tracker API. See /docs for OpenAPI UI."
+    }
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"], #we keep changing link so I keep it * for now, curr link: https://sprint2microservicewebapp.ue.r.appspot.com/
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
