@@ -26,7 +26,6 @@ gcloud run services update matcha-composite-service \
   --region us-central1 \
   --set-env-vars \
 JWT_SECRET="cloud-run-secret",\
-GOOGLE_CLIENT_ID = "",\
 USER_SERVICE_BASE_URL="https://matcha-api-ktr6lb33ta-uc.a.run.app",\
 BUDGET_SERVICE_BASE_URL="http://136.110.166.166",\
 RANKING_SERVICE_BASE_URL="https://matchamania-rankings-api-945802238964.us-central1.run.app"
