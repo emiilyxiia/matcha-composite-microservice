@@ -10,9 +10,6 @@ async def get_expenses(limit: int = 10, offset: int = 0) -> list[dict]:
       - Query params: limit, offset
       - Response: JSON array of expense objects, each may include "links".
     """
-    # TEMP: if no budget service, just return an empty list to avoid hanging
-    if not BUDGET_SERVICE_BASE_URL:
-        return []
     url = f"{BUDGET_SERVICE_BASE_URL}/expenses"
     params = {"limit": limit, "offset": offset}
     async with httpx.AsyncClient() as client:

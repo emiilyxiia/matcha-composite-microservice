@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from src.routes.summary import router as summary_router
 from fastapi.middleware.cors import CORSMiddleware
+from src.routes.auth import router as auth_router
+
+app = FastAPI(title="Matcha Composite Service", version="0.1.0")
 
 app = FastAPI(
     title="Matcha Composite Service",
@@ -10,7 +13,7 @@ app = FastAPI(
 @app.get("/")
 def root():
     return {
-        "message": "Welcome to the Matcha Drinking Tracker API. See /docs for OpenAPI UI."
+        "Welcome to the Matcha Drinking Tracker API. See /docs for OpenAPI UI."
     }
 
 app.add_middleware(
@@ -22,3 +25,4 @@ app.add_middleware(
 )
 
 app.include_router(summary_router)
+app.include_router(auth_router)

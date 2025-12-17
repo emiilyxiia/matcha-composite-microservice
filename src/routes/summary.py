@@ -1,14 +1,26 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 import asyncio
-
+import httpx
 from src.clients.user_client import get_user
 from src.clients.budget_client import get_expenses
 from src.clients.ranking_client import get_rankings_for_user
+from src.auth.deps import require_jwt
 
 router = APIRouter()
 
+async def safe(coro, default):
+    """Prevents one downstream failure from crashing the whole summary."""
+    try:
+        return await coro
+    except (httpx.HTTPError, Exception):
+        return default
+
 @router.get("/summary/users/{user_id}")
-async def get_user_summary(user_id: str, limit: int = 10):
+async def get_user_summary(
+    user_id: str,
+    limit: int = 10,
+    _auth=Depends(require_jwt)  #Enforce JWT
+):
     """
     Composite summary for a user.
 
@@ -22,7 +34,7 @@ async def get_user_summary(user_id: str, limit: int = 10):
        - Budget Service:   GET /expenses?limit={limit}&offset=0
 
     3. Aggregate response:
-       - user
+       - username
        - rankings
        - recentExpenses
        - stats (totalExpenseCost, numExpenses, averageRankingScore, numRankingEntries)
@@ -33,9 +45,12 @@ async def get_user_summary(user_id: str, limit: int = 10):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # 2. Parallel calls to M2 and M3
-    rankings_task = asyncio.create_task(get_rankings_for_user(user_id))
-    expenses_task = asyncio.create_task(get_expenses(limit=limit, offset=0))
+    username = user.get("username")
+    matcha_budget = user.get("matcha_budget")  # this is in your M1 payload
+
+    # 2. parallel calls (M2 + M3)
+    rankings_task = asyncio.create_task(safe(get_rankings_for_user(user_id), []))
+    expenses_task = asyncio.create_task(safe(get_expenses(limit=limit, offset=0), []))
 
     rankings, expenses = await asyncio.gather(rankings_task, expenses_task)
 
@@ -57,16 +72,13 @@ async def get_user_summary(user_id: str, limit: int = 10):
             if isinstance(rating, (int, float)):
                 scores.append(rating)
 
-    average_rating = sum(scores) / len(scores) if scores else None
+    avg_rating = sum(scores) / len(scores) if scores else None
 
     return {
-        "user": user,
+        "username": username,
+        "matcha_budget": matcha_budget,
         "rankings": rankings,
-        "recentExpenses": expenses,
-        "stats": {
-            "totalExpenseCost": total_cost,
-            "numExpenses": num_expenses,
-            "averageRankingScore": average_rating,
-            "numRankingEntries": len(rankings),
-        },
+        "totalExpenseCost": total_cost,
+        "numExpenses": num_expenses,
+        "averageRankingScore": avg_rating,
     }
