@@ -4,7 +4,6 @@ def env(name: str, default: str | None = None) -> str | None:
     return os.getenv(name, default)
 
 #local dev URLs:
-
 USER_SERVICE_BASE_URL = env(
     "USER_SERVICE_BASE_URL",
     "https://matcha-api-ktr6lb33ta-uc.a.run.app"
@@ -35,8 +34,9 @@ GOOGLE_CLIENT_ID = env(
 gcloud run services update matcha-composite-service \
   --region us-central1 \
   --set-env-vars \
-JWT_SECRET="some-long-random-string",\
-GOOGLE_CLIENT_ID="YOUR_CLIENT_ID.apps.googleusercontent.com",\
+JWT_SECRET="cloud-run-secret-placeholder",\
+GOOGLE_CLIENT_ID="placeholder since I don't want to put the real one here, it's in cloud run",\
 USER_SERVICE_BASE_URL="https://matcha-api-ktr6lb33ta-uc.a.run.app",\
 BUDGET_SERVICE_BASE_URL="http://136.110.166.166",\
-RANKING_SERVICE_BASE_URL="https://matchamania-rankings-api-945802238964.us-central1.run.app"'''
+RANKING_SERVICE_BASE_URL="https://matchamania-rankings-api-945802238964.us-central1.run.app"
+'''

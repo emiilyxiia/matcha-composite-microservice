@@ -35,9 +35,10 @@ async def get_user_summary(
 
     3. Aggregate response:
        - username
-       - rankings
-       - recentExpenses
-       - stats (totalExpenseCost, numExpenses, averageRankingScore, numRankingEntries)
+       - matcha budget
+       - Top 5 most worth matchas (worth = rating / cost_per_gram)
+       - average rating
+       - total expense cost
     """
 
     # 1. FK check: user must exist
@@ -74,11 +75,29 @@ async def get_user_summary(
 
     avg_rating = sum(scores) / len(scores) if scores else None
 
+    worth_items = []
+    for r in rankings:
+        for item in r.get("items", []):
+            name = item.get("name")
+            rating = item.get("rating")
+            cpg = item.get("cost_per_gram")  # from M3 RankedItem
+            origin = item.get("origin")
+
+            if isinstance(rating, (int, float)) and isinstance(cpg, (int, float)) and cpg > 0:
+                worth_items.append({
+                    "name": name,
+                    "origin": origin,
+                    "rating": rating,
+                    "cost_per_gram": cpg,
+                    "worth": round(rating / cpg, 2)
+                })
+    worth_items.sort(key=lambda x: x["worth"], reverse=True)
+    top_worth = worth_items[:5]
+
     return {
         "username": username,
         "matcha_budget": matcha_budget,
-        "rankings": rankings,
-        "totalExpenseCost": total_cost,
-        "numExpenses": num_expenses,
+        "mostWorthLeaderboard": top_worth,
         "averageRankingScore": avg_rating,
+        "totalExpenses": total_cost,
     }
