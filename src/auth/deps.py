@@ -1,14 +1,11 @@
-from fastapi import Header, HTTPException
-from jose import jwt, JWTError
-from src.config import JWT_ALGORITHM, JWT_SECRET
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from src.auth.jwt import decode_access_token
 
-def require_jwt(authorization: str | None = Header(default=None)) -> dict:
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing Bearer token")
+bearer_scheme = HTTPBearer()
 
-    token = authorization.removeprefix("Bearer ").strip()
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        return payload
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
+def require_jwt(
+    creds: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+):
+    token = creds.credentials
+    return decode_access_token(token)
