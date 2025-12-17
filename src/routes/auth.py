@@ -1,13 +1,18 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
-
 from src.config import GOOGLE_CLIENT_ID
 from src.auth.jwt import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+class DevLoginRequest(BaseModel):
+    email: str = "demo@matcha.app"
+
+@router.post("/dev-login")
+def dev_login(body: DevLoginRequest):
+    token = create_access_token(subject=body.email)
+    return {"access_token": token, "token_type": "bearer"}
 
 class GoogleLoginRequest(BaseModel):
     id_token: str
