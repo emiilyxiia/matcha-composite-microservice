@@ -73,7 +73,7 @@ async def get_user_summary(
             if isinstance(rating, (int, float)):
                 scores.append(rating)
 
-    avg_rating = sum(scores) / len(scores) if scores else None
+    avg_rating = round(sum(scores) / len(scores),2) if scores else None
 
     worth_items = []
     for r in rankings:
