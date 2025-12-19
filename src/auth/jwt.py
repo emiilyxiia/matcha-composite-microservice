@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from fastapi import HTTPException
 from jose import jwt, JWTError
 from src.config import JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRE_MINUTES
 
@@ -15,4 +16,4 @@ def decode_access_token(token: str) -> dict:
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     except JWTError:
-        raise
+        raise HTTPException(status_code=401, detail="Invalid or expired token")

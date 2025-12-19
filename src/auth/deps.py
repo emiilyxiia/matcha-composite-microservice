@@ -9,5 +9,5 @@ def require_jwt(creds: HTTPAuthorizationCredentials | None = Depends(bearer_sche
     if creds is None:
         raise HTTPException(status_code=401, detail="Missing Bearer token")
 
-    token = creds.credentials  # automatically strips "Bearer "
+    token = creds.credentials
     return decode_access_token(token)

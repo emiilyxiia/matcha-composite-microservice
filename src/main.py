@@ -4,18 +4,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.routes.auth import router as auth_router
 from fastapi.security import HTTPBearer
 
-app = FastAPI(title="Matcha Composite Service", version="0.1.0")
 security = HTTPBearer()
 
 app = FastAPI(
-    title="Matcha Composite Service",
-    version="0.1.0",
+    title="Matcha Summary - Composite Microservice",
+    version="1.0.0",
 )
 
 @app.get("/")
 def root():
     return {
-        "Welcome to the Matcha Drinking Tracker API. See /docs for OpenAPI UI."
+       "message": "Welcome to the Matcha Composite Service. See /docs for API documentation."
     }
 
 app.add_middleware(
