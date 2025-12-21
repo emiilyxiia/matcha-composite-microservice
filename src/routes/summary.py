@@ -60,7 +60,7 @@ async def get_user_summary(
     rankings, expenses = await asyncio.gather(rankings_task, expenses_task)
 
     # 3. Compute stats
-    # Expenses: total cost & count
+    # Expenses: total expenses and recent expenses
     total_cost = 0.0
     num_expenses = 0
     for e in expenses:
@@ -68,6 +68,12 @@ async def get_user_summary(
         if isinstance(cost, (int, float)):
             total_cost += cost
         num_expenses += 1
+
+    expenses_sorted = sorted(
+        expenses,
+        key=lambda e: e.get("expense_date") or "",
+        reverse=True
+    )
 
     # Rankings: average rating across all items
     scores: list[float] = []
@@ -104,5 +110,5 @@ async def get_user_summary(
         "mostWorthLeaderboard": top_worth,  #from ranking microservice
         "averageRankingScore": avg_rating,  #from ranking microservice
         "totalExpenses": total_cost,        #from budget microservice
-        "recentExpenses": expenses,         #from budget microservice
+        "recentExpenses": expenses_sorted,         #from budget microservice
     }
