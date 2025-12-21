@@ -1,7 +1,6 @@
 import httpx
 from src.config import BUDGET_SERVICE_BASE_URL
 
-#no actual url for budget yet since it is on VM
 async def get_expenses(limit: int = 10, offset: int = 0) -> list[dict]:
     """
     Fetch a page of expenses from the Budget service.

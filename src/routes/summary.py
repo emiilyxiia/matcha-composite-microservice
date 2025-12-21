@@ -34,11 +34,15 @@ async def get_user_summary(
        - Budget Service:   GET /expenses?limit={limit}&offset=0
 
     3. Aggregate response:
-       - username
-       - matcha budget
-       - Top 5 most worth matchas (worth = rating / cost_per_gram)
-       - average rating
-       - total expense cost
+       - USER INFO
+            - username
+            - matcha budget
+       - RANKINGS INFO
+            - average rating score across all ranked items
+            - Top 5 most worth matchas (worth = rating / cost_per_gram)
+       - BUDGET INFO    
+            - total expense cost
+            - recent expenses
     """
 
     # 1. FK check: user must exist
@@ -95,9 +99,10 @@ async def get_user_summary(
     top_worth = worth_items[:5]
 
     return {
-        "username": username,
-        "matcha_budget": matcha_budget,
-        "mostWorthLeaderboard": top_worth,
-        "averageRankingScore": avg_rating,
-        "totalExpenses": total_cost,
+        "username": username,               #from user microservice
+        "matcha_budget": matcha_budget,     #from user microservice
+        "mostWorthLeaderboard": top_worth,  #from ranking microservice
+        "averageRankingScore": avg_rating,  #from ranking microservice
+        "totalExpenses": total_cost,        #from budget microservice
+        "recentExpenses": expenses,         #from budget microservice
     }
